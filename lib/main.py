@@ -12,8 +12,11 @@ square_fill = fwidth, fheight = (WIDTH//BWIDTH - 1, HEIGHT//BHEIGHT - 1)
 #line_buffer = 2
 BACKGROUND_COLOR = pygame.Color('blue')
 GAME_TICK = pygame.USEREVENT
+INCREASE_SPEED = pygame.USEREVENT + 1
 BORDER_WIDTH = 5
 STARTING_TICK_MS = 500
+INCREASE_SPEED_INTERVAL = 60000
+TICK_SPAN_DECREASE = 95
 
 def color_piece(piece_value):
     if piece_value == 1:
@@ -63,9 +66,10 @@ def main():
     screen = pygame.display.set_mode(SIZE)
     pygame.display.set_caption('Tetris at home')
     game = engine.Game(BHEIGHT, BWIDTH)
-    
-    # If you want to change the speed, set this timer back to 0 and create a new one in the game loop (maybe a SPEED_UP event?)
-    pygame.time.set_timer(GAME_TICK, STARTING_TICK_MS)
+   
+    pygame.time.set_timer(INCREASE_SPEED, INCREASE_SPEED_INTERVAL)
+    tickspeed = STARTING_TICK_MS
+    pygame.time.set_timer(GAME_TICK, tickspeed)
     playing = True
     while playing:
 
@@ -86,6 +90,11 @@ def main():
                 game.on_input(engine.User_action.ROTATE)
             elif event.type == GAME_TICK:
                 playing = game.on_tick()
+            elif event.type == INCREASE_SPEED:
+                pygame.time.set_timer(GAME_TICK, 0)
+                tickspeed = tickspeed - TICK_SPAN_DECREASE
+                pygame.time.set_timer(GAME_TICK, tickspeed)
+
         
         draw_game(screen, game.game_state())
     
