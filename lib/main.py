@@ -51,9 +51,8 @@ def main():
     pygame.init()
     screen = pygame.display.set_mode(SIZE)
     pygame.display.set_caption('Tetris at home')
+    game = engine.Game(BHEIGHT, BWIDTH)
     
-    draw_game(screen, engine.static_game())
-
     # If you want to change the speed, set this timer back to 0 and create a new one in the game loop (maybe a SPEED_UP event?)
     pygame.time.set_timer(GAME_TICK, 1000)
     playing = True
@@ -67,15 +66,17 @@ def main():
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 playing = False
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_LEFT:
-                print('left')
+                game.on_input(engine.User_action.LEFT)
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_RIGHT:
-                print('right')
+                game.on_input(engine.User_action.RIGHT)
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN:
+                game.on_input(engine.User_action.DOWN)
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-                print('rotate')
+                game.on_input(engine.User_action.ROTATE)
             elif event.type == GAME_TICK:
-                print('tick')
+                playing = game.on_tick()
         
-        draw_game(screen, engine.static_game())
+        draw_game(screen, game.game_state())
     
     print(str(engine.static_game()))
     pygame.quit()
