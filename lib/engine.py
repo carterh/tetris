@@ -1,12 +1,11 @@
 from enum import Enum
 import random
 
-def static_game():
+def static_test_game():
     game_row = [0 for i in range(10)]
     game = [game_row for i in range(20)]
     game[0][0:4] = [1,1,3,1]
     return game
-
 
 class Tetromino(Enum):
     oh = 1
@@ -33,27 +32,36 @@ class Direction(Enum):
         self.col_offset = co
 
 class Piece:
-    def __init__(self, shape, location, offsets):
+    offset_lists = {
+            Tetromino.oh:[[(0,0),(0,1),(1,0),(1,1)]],
+            Tetromino.aye:[[(0,0),(0,-1),(0,1),(0,2)], [(0,0),(-1,0),(1,0),(2,0)]],
+            Tetromino.tee:[[(0,0),(0,-1),(0,1),(1,0)],[(0,0),(-1,0),(0,-1),(1,0)],[(0,0),(0,-1),(0,1),(-1,0)], [(0,0),(0,1),(-1,0),(1,0)]],
+            Tetromino.ell:[[(0,0),(0,-1),(0,1),(1,-1)],[(0,0),(1,0),(-1,0),(-1,-1)] ,[(0,0),(0,-1),(0,1),(-1,1)] ,[(0,0),(1,0),(-1,0),(1,1)]],
+            Tetromino.jay:[[(0,0),(0,-1),(0,1),(1,1)],[(0,0),(1,0),(-1,0),(1,-1)] ,[(0,0),(0,-1),(0,1),(-1,-1)] ,[(0,0),(1,0),(-1,0),(-1,1)]],
+            Tetromino.ess:[[(0,0),(1,0),(1,-1),(0,1)], [(0,0),(1,0),(0,-1),(-1,-1)]],
+            Tetromino.zee:[[(0,0),(0,-1),(1,0),(1,1)], [(0,0),(0,1),(-1,1),(1,0)]]
+    }
+    def __init__(self, shape, location, offset_index):
         self.shape = shape
         self.row, self.col = location
-        self.offsets = offsets
+        self.offset_index = offset_index
 
     def absolute_coordinates(self):
         coords = []
-        for ro, co in self.offsets:
+        for ro, co in Piece.offset_lists[self.shape][self.offset_index]:
             coords.append((self.row + ro, self.col + co))
         return coords
 
     @staticmethod
     def random_piece(row, col):
         shape = Tetromino(random.randint(1,7)) 
-        return Piece(shape, (row, col), [(0,0),(0,1),(1,0),(1,1)])
+        return Piece(shape, (row, col), 0)
 
     def get_moved_piece(self, direction):
-        return Piece(self.shape, (self.row + direction.row_offset, self.col + direction.col_offset), self.offsets)
+        return Piece(self.shape, (self.row + direction.row_offset, self.col + direction.col_offset), self.offset_index)
 
     def get_rotated_piece(self):
-        new_offsets = self.offsets
+        new_offsets = (self.offset_index + 1) % len(Piece.offset_lists[self.shape])
         return Piece(self.shape, (self.row, self.col), new_offsets)
 
 class Game:
@@ -77,7 +85,7 @@ class Game:
         while r >= 0:
             if all(self.board[r]):
                 self.board.pop(r)
-                self.board.insert(r, [0 for i in range(self.cols)])
+                self.board.insert(0, [0 for i in range(self.cols)])
             else:
                 r = r-1
 

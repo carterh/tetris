@@ -13,14 +13,25 @@ square_fill = fwidth, fheight = (WIDTH//BWIDTH - 1, HEIGHT//BHEIGHT - 1)
 BACKGROUND_COLOR = pygame.Color('blue')
 GAME_TICK = pygame.USEREVENT
 BORDER_WIDTH = 5
+STARTING_TICK_MS = 500
 
 def color_piece(piece_value):
-    if piece_value == 0:
-        return pygame.Color('blue')
-    elif piece_value == 1:
+    if piece_value == 1:
         return pygame.Color('red')
-    else:
+    if piece_value == 2:
+        return pygame.Color('orange')
+    if piece_value == 3:
+        return pygame.Color('yellow')
+    if piece_value == 4:
         return pygame.Color('green')
+    if piece_value == 5:
+        return pygame.Color('purple')
+    if piece_value == 6:
+        return pygame.Color('cyan')
+    if piece_value == 7:
+        return pygame.Color('pink')
+    else:
+        return BACKGROUND_COLOR
 
 def convert_rc_to_coords(row, col):
     y = row*sheight
@@ -54,7 +65,7 @@ def main():
     game = engine.Game(BHEIGHT, BWIDTH)
     
     # If you want to change the speed, set this timer back to 0 and create a new one in the game loop (maybe a SPEED_UP event?)
-    pygame.time.set_timer(GAME_TICK, 1000)
+    pygame.time.set_timer(GAME_TICK, STARTING_TICK_MS)
     playing = True
     while playing:
 
@@ -78,7 +89,6 @@ def main():
         
         draw_game(screen, game.game_state())
     
-    print(str(engine.static_game()))
     pygame.quit()
 
 if __name__ == '__main__':
